@@ -25,21 +25,18 @@
 
 /* Includes */
 #include "stm32f30x.h"
-#include "stm32f3_discovery.h"
+#include "stm32f30x_conf.h"
 #include "common.h"
 
 /* Private typedef */
-
-/* Private define  */
-#define DELAY	(1000)
-
-/* Private macro */
-
-/* Private variables */
-float a, b, c, d;
+#define PRESCL 		24
+#define PWM_BASE	59638
+#define PWM_MIN		2982
+#define PWM_MAX 	5964
 
 /* Private function prototypes */
-
+void GPIO_Configuration();
+void RCC_Configuration();
 /* Private functions */
 
 /* Global variables */
@@ -56,65 +53,63 @@ float a, b, c, d;
  */
 int main(void)
 {
-	uint32_t ii;
 
-	/* Example use SysTick timer and read System core clock */
-	SysTick_Config(72);  /* 1 us if clock frequency 72 MHz */
+	RCC_Configuration();
+	GPIO_Configuration();
+
+	TIM_TimeBaseInitTypeDef timInit;
+	TIM_OCInitTypeDef timChannelInit;
 
 	SystemCoreClockUpdate();
-	ii = SystemCoreClock;   /* This is a way to read the System core clock */
+	uint16_t prescale = (uint16_t)((SystemCoreClock/24000000 - 1) * PRESCL);
 
-	/* Initialize LEDs and User Button available on STM32F3-Discovery board */
-	STM_EVAL_LEDInit(LED3);
-	STM_EVAL_LEDInit(LED4);
-	STM_EVAL_LEDInit(LED5);
-	STM_EVAL_LEDInit(LED6);
-	STM_EVAL_LEDInit(LED7);
-	STM_EVAL_LEDInit(LED8);
-	STM_EVAL_LEDInit(LED9);
-	STM_EVAL_LEDInit(LED10);
+	/* Time base configuration */
+	timInit.TIM_Period = PWM_BASE;
+	timInit.TIM_Prescaler = prescale;
+	timInit.TIM_ClockDivision = 0;
+	timInit.TIM_CounterMode = TIM_CounterMode_Up;
 
-	//STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
+	TIM_TimeBaseInit(TIM3, &timInit);
 
-	while (1)
-	{
-		/* Waiting User Button is pressed */
-		//while (UserButtonPressed == 0x00)
-		{
-			/* Toggle LD3 */
-			STM_EVAL_LEDToggle(LED3);
-			_delay_ms(DELAY);
+	/* PWM1 Chanel1 (PC6) */
+	timChannelInit.TIM_OCMode = TIM_OCMode_PWM1;
+	timChannelInit.TIM_OutputState = TIM_OutputState_Enable;
+	timChannelInit.TIM_Pulse = PWM_MIN;
 
-			/* Toggle LD5 */
-	//		STM_EVAL_LEDToggle(LED5);
-	//		_delay_ms(DELAY);
+	TIM_OC1Init(TIM3, &timChannelInit);
 
-			/* Toggle LD7 */
-	//		STM_EVAL_LEDToggle(LED7);
-	//		_delay_ms(DELAY);
+	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
-			/* Toggle LD9 */
-			STM_EVAL_LEDToggle(LED9);
-			_delay_ms(DELAY);
+	TIM_ARRPreloadConfig(TIM3, ENABLE);
 
-			/* Toggle LD10 */
-			STM_EVAL_LEDToggle(LED10);
-			_delay_ms(DELAY);
+	TIM_Cmd(TIM3, ENABLE);
 
-			/* Toggle LD8 */
-			STM_EVAL_LEDToggle(LED8);
-			_delay_ms(DELAY);
-
-			/* Toggle LD6 */
-			STM_EVAL_LEDToggle(LED6);
-			_delay_ms(DELAY);
-
-			/* Toggle LD4 */
-			STM_EVAL_LEDToggle(LED4);
-			_delay_ms(DELAY);
-		}
-	}
+	while(1)
+		continue;
 
 	/* Program will never run to this line */
 	return 0;
+}
+
+void RCC_Configuration()
+{
+	/* TIM3 clock enable */
+	  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+
+
+	  /* GPIOC clock enable */
+	  RCC_APB2PeriphClockCmd(RCC_AHBENR_GPIOCEN, ENABLE);
+
+}
+
+void GPIO_Configuration()
+{
+	GPIO_InitTypeDef gpio;
+
+	gpio.GPIO_Pin = GPIO_Pin_6;
+	gpio.GPIO_Mode = GPIO_Mode_AF;
+	gpio.GPIO_Speed = GPIO_Speed_50MHz;
+
+	GPIO_Init(GPIOC, &gpio);
+
 }

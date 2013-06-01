@@ -9,7 +9,6 @@
 #define COMMON_H_
 
 #include "stm32f30x.h"
-#include "stm32f3_discovery.h"
 #include <stdio.h>
 #include <stdint.h>
 #include "stm32f3_discovery_lsm303dlhc.h"
