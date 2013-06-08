@@ -27,6 +27,7 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f3_discovery_lsm303dlhc.h"
+#include "stm32f30x_conf.h"
 
 /** @addtogroup Utilities
   * @{
