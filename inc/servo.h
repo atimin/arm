@@ -20,6 +20,7 @@
 
 #include "stm32f30x_conf.h"
 #include "stm32f30x.h"
+#include "stm32f3_discovery.h"
 
 #define SERVOn		6
 

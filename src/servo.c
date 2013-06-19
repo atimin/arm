@@ -44,6 +44,7 @@ static uint8_t rccOn = 0;
 
 void RCC_Configuration()
 {
+
 	/* TIM3 clock enable */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 	/* TIM4 clock enable */
@@ -54,13 +55,14 @@ void RCC_Configuration()
 	/* GPIOD clock enable */
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);
 
+
 }
 
 void TIM_Configuration()
 {
 	TIM_TimeBaseInitTypeDef timInit;
 
-	/* TIM3&4 */
+	/* TIM2&3&4 */
 	/* Time base configuration */
 	timInit.TIM_Period = PWM_BASE;
 	timInit.TIM_Prescaler = PRESCL;
@@ -69,6 +71,18 @@ void TIM_Configuration()
 
 	TIM_TimeBaseInit(TIM3, &timInit);
 	TIM_TimeBaseInit(TIM4, &timInit);
+
+
+	TIM_ITConfig(TIM3, TIM_IT_Update , ENABLE);
+
+	/* Turn on interrupt for TIM2 */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	/* Enable the TIM2 gloabal Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
 }
 
 void InitServo(Servo_TypeDef serv)
@@ -77,7 +91,7 @@ void InitServo(Servo_TypeDef serv)
 	TIM_OCInitTypeDef timChannelInit;
 
 	/* Turn on clock and timers if they're turned off */
-	if (rccOn) {
+	if (!rccOn) {
 		RCC_Configuration();
 		TIM_Configuration();
 		rccOn = 1;
@@ -107,3 +121,15 @@ void InitServo(Servo_TypeDef serv)
 	TIM_Cmd(TIM[serv], ENABLE);
 }
 
+static uint32_t a = 0;
+void TIM3_IRQHandler()
+{
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET) {
+		if (++a == 50) {
+			STM_EVAL_LEDToggle(LED10);
+			a = 0;
+		}
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	}
+
+}
