@@ -21,8 +21,13 @@
 #include "stm32f30x_conf.h"
 #include "stm32f30x.h"
 #include "stm32f3_discovery.h"
+#include "math.h"
+#include "salloc.h"
 
 #define SERVOn		6
+
+#define SERVO_MOVING 	1
+#define SERVO_STOPED 	0
 
 #define PRESCL 		12
 #define PWM_BASE	59638
@@ -76,11 +81,19 @@ typedef enum
 	SERVO6
 } Servo_TypeDef;
 
+typedef struct
+{
+	uint8_t id;					// number of servo
+	float_t currentAngle;		// current angle 0 - pi/2 [rad]
+	float_t setAngle;			// setpoint from 0 - pi/2 [rad]
+	float_t velocity;			// velocity [rad/s]
+} Servo_TypeStruct;
 
-extern void InitServo(Servo_TypeDef serv);
+extern void Serv_Init(Servo_TypeDef serv);
+extern void Servo_SetAngle(Servo_TypeDef serv, float_t angle, float_t velocity);
+extern float_t Servo_GetAngle(Servo_TypeDef serv);
+extern uint8_t Servo_IsMove(Servo_TypeDef serv);
 
 #define SERVO_H_
-
-
 
 #endif /* SERVO_H_ */

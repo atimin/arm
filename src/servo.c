@@ -39,6 +39,9 @@ void (*TIM_OCXPreloadConfig[SERVOn])(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload) 
 		TIM_OC1PreloadConfig, TIM_OC2PreloadConfig, TIM_OC3PreloadConfig, TIM_OC4PreloadConfig
 };
 
+
+static Servo_TypeStruct servs[SERVOn];
+
 static uint8_t rccOn = 0;
 
 
@@ -85,7 +88,8 @@ void TIM_Configuration()
 	NVIC_Init(&NVIC_InitStructure);
 }
 
-void InitServo(Servo_TypeDef serv)
+/* Initialization servo by nymber */
+void Servo_Init(Servo_TypeDef serv)
 {
 	GPIO_InitTypeDef gpio;
 	TIM_OCInitTypeDef timChannelInit;
@@ -119,16 +123,82 @@ void InitServo(Servo_TypeDef serv)
 
 	TIM_ARRPreloadConfig(TIM[serv], ENABLE);
 	TIM_Cmd(TIM[serv], ENABLE);
+
+	/* Make struct for servo */
+
+	servs[serv].id = serv;
+	servs[serv].currentAngle = M_PI/4;
+	servs[serv].setAngle = M_PI/4;
+	servs[serv].velocity = 0;
+}
+
+void Servo_SetAngle(Servo_TypeDef serv, float_t angle, float_t velocity)
+{
+	if (angle < 0)
+		angle = 0;
+	if (angle > M_PI_2)
+		angle = M_PI_2;
+
+	servs[serv].setAngle = angle;
+	servs[serv].velocity = velocity;
+}
+
+float_t Servo_GetAngle(Servo_TypeDef serv)
+{
+	return servs[serv].currentAngle;
+}
+
+uint8_t Servo_IsMove(Servo_TypeDef serv)
+{
+	return (servs[serv].setAngle == servs[serv].currentAngle ? SERVO_STOPED : SERVO_MOVING);
 }
 
 static uint32_t a = 0;
+
+
+#define CONTROL_FREQ 50
+
+void Step(Servo_TypeDef serv)
+{
+	TIM_OCInitTypeDef timChannelInit;
+	Servo_TypeStruct *s = &servs[serv];
+	float_t nextPose;
+
+	/* Calc the next position */
+	if (s->currentAngle == s->setAngle)
+		return;
+	else if (s->currentAngle < s->setAngle)
+		nextPose = s->currentAngle + s->velocity / CONTROL_FREQ;
+	else if (s->currentAngle > s->setAngle)
+		nextPose = s->currentAngle - s->velocity / CONTROL_FREQ;
+
+	/* Turn by one step */
+	s->currentAngle = (nextPose >= s->setAngle ?  s->setAngle : nextPose);
+
+	/* Change channel */
+	timChannelInit.TIM_OCMode = TIM_OCMode_PWM1;
+	timChannelInit.TIM_OutputState = TIM_OutputState_Enable;
+	timChannelInit.TIM_OCPolarity =TIM_OCPolarity_High;
+	timChannelInit.TIM_Pulse = PWM_MIN + (s->currentAngle / M_PI_2)*(PWM_MAX - PWM_MIN);
+
+	TIM_OCXInit[serv](TIM[serv], &timChannelInit);
+}
+
 void TIM3_IRQHandler()
 {
 	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET) {
-		if (++a == 50) {
+
+		// Heartbeat
+		if (++a == CONTROL_FREQ) {
 			STM_EVAL_LEDToggle(LED10);
 			a = 0;
 		}
+
+		uint8_t i;
+		for(i=0; i < SERVOn; i++) {
+			Step(i);
+		}
+
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 	}
 
