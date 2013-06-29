@@ -21,8 +21,7 @@
 #include "stm32f30x_conf.h"
 #include "stm32f30x.h"
 #include "stm32f3_discovery.h"
-#include "math.h"
-#include "salloc.h"
+#include <math.h>
 
 #define SERVOn		6
 
@@ -68,7 +67,7 @@
 #define SERVO6_PIN 	GPIO_Pin_13
 #define SERVO6_PORT	GPIOD
 #define SERVO6_SRC	GPIO_PinSource13
-#define SERVO6_TIM		TIM6
+#define SERVO6_TIM		TIM4
 #define SERVO6_CHANELL	TIM_Channel_2
 
 typedef enum

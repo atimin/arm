@@ -32,11 +32,11 @@ TIM_TypeDef* TIM[SERVOn] = { SERVO1_TIM, SERVO2_TIM, SERVO3_TIM,
 		SERVO4_TIM, SERVO5_TIM, SERVO6_TIM };
 
 void (*TIM_OCXInit[SERVOn])(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)= {
-		TIM_OC1Init, TIM_OC2Init, TIM_OC3Init, TIM_OC4Init
+		TIM_OC1Init, TIM_OC2Init, TIM_OC3Init, TIM_OC4Init, TIM_OC1Init, TIM_OC2Init
 };
 
 void (*TIM_OCXPreloadConfig[SERVOn])(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload) = {
-		TIM_OC1PreloadConfig, TIM_OC2PreloadConfig, TIM_OC3PreloadConfig, TIM_OC4PreloadConfig
+		TIM_OC1PreloadConfig, TIM_OC2PreloadConfig, TIM_OC3PreloadConfig, TIM_OC4PreloadConfig, TIM_OC1PreloadConfig, TIM_OC2PreloadConfig
 };
 
 
@@ -108,7 +108,7 @@ void Servo_Init(Servo_TypeDef serv)
 	gpio.GPIO_PuPd = GPIO_PuPd_UP;
 	gpio.GPIO_Speed = GPIO_Speed_2MHz;
 
-	GPIO_PinAFConfig(GPIOC, SERVO_SRC[serv], GPIO_AF_2);
+	GPIO_PinAFConfig(SERVO_PORT[serv], SERVO_SRC[serv], GPIO_AF_2);
 	GPIO_Init(SERVO_PORT[serv], &gpio);
 
 	/* Init channel */
