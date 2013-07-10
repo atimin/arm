@@ -19,7 +19,7 @@ SIZE		= $(TC)-size
 
 ###################################################
 # Set Sources
-LIB_SRCS	= $(wildcard Libraries/STM32F30x_StdPeriph_Driver/src/*.c)
+LIB_SRCS	= $(wildcard Libraries/STM32F30x_StdPeriph_Driver/src/*.c Libraries/STM32_USB-FS-Device_Driver/src/*.c)
 USER_SRCS	= $(wildcard src/*.c)
 
 # Set Objects
@@ -30,6 +30,7 @@ USER_OBJS	= $(USER_SRCS:.c=.o) src/startup_stm32f30x.o
 INCLUDES 	= -ILibraries/STM32F30x_StdPeriph_Driver/inc/ \
 			-ILibraries/CMSIS/Include \
 			-ILibraries/CMSIS/Device/ST/STM32F30x/Include \
+			-ILibraries/STM32_USB-FS-Device_Driver/inc \
 			-Iinc/
 			
 # Set Libraries

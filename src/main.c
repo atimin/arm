@@ -23,18 +23,18 @@
  *****************************************************************************
  */
 
+#include <stdint.h>
+#include <stdio.h>
 /* Includes */
 #include "servo.h"
 #include "stm32f30x.h"
 #include "stm32f30x_conf.h"
 #include "common.h"
+#include "usb_lib.h"
 
-/* Private typedef */
-#define PRESCL 		12
-#define PWM_BASE	59638
-#define PWM_MIN		3282
-#define PWM_MAX 	13821
-#define PWM_MIDLE 	((PWM_MAX-PWM_MIN) / 2 + PWM_MIN)
+
+
+
 
 
 
@@ -44,6 +44,10 @@
 
 
 
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+  USB_Istr();
+}
 
 /**
  **===========================================================================
@@ -54,6 +58,12 @@
  */
 int main(void)
 {
+
+	Set_System();
+	Set_USBClock();
+	USB_Interrupts_Config();
+	USB_Init();
+
 	STM_EVAL_LEDInit(LED10);
 
 	Servo_Init(SERVO1);
