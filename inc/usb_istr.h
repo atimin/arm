@@ -26,7 +26,7 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
-void USB_Istr(void);
+extern void USB_Istr(void);
 
 /* function prototypes Automatically built defining related macros */
 

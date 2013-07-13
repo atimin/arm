@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_type.h"
+#include "stm32f30x.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -36,11 +37,11 @@ void Set_USBClock(void);
 void Enter_LowPowerMode(void);
 void Leave_LowPowerMode(void);
 void USB_Interrupts_Config(void);
-void USB_Cable_Config (FunctionalState NewState);
+// void USB_Cable_Config (FunctionalState NewState);
 void Get_SerialNum(void);
+extern void Handle_USBAsynchXfer(void);
 
 
-void Handle_USBAsynchXfer (void);
 void USB_Send_Data(uint8_t data);
 void USB_SetLeds(uint8_t LED_Command);
 

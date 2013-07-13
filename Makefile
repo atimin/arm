@@ -1,9 +1,10 @@
-ROOT=$(shell pwd)
+ROзуOT=$(shell pwd)
 PROJ_NAME = arm_spok1
 
 ###################################################
 # Set toolchain
-TC = /home/flipback/stm32/CodeSourcery/Sourcery_CodeBench_Lite_for_ARM_EABI/bin/arm-none-eabi
+# TC = /home/flipback/stm32/CodeSourcery/Sourcery_CodeBench_Lite_for_ARM_EABI/bin/arm-none-eabi
+TC = /home/flipback/stm32/gcc-arm-none-eabi-4_7-2013q2/bin/arm-none-eabi
 #TC = ~/CodeSourcery/bin/arm-none-eabi
 #TC = ~/CodeSourcery/Sourcery_CodeBench_Lite_for_ARM_EABI/bin/arm-none-eabi
 #TC = C:\Program Files\Atollic\TrueSTUDIO for ARM Lite 3.2.0\ARMTools\bin\arm-atollic-eabi

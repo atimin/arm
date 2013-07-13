@@ -14,6 +14,7 @@
 *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f3_discovery.h"
 #include "usb_lib.h"
 #include "usb_prop.h"
 #include "usb_desc.h"
@@ -49,7 +50,12 @@ static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len);
 *******************************************************************************/
 void Set_System(void)
 {
-  GPIO_InitTypeDef  GPIO_InitStructure;
+
+	STM_EVAL_LEDInit(LED3);
+	STM_EVAL_LEDInit(LED4);
+	STM_EVAL_LEDInit(LED5);
+	STM_EVAL_LEDInit(LED6);
+  /* GPIO_InitTypeDef  GPIO_InitStructure; */
   
   /*!< At this stage the microcontroller clock setting is already configured, 
        this is done through SystemInit() function which is called from startup
@@ -60,21 +66,21 @@ void Set_System(void)
   
   
   /* Enable USB_DISCONNECT GPIO clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT, ENABLE);
+  /* RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT, ENABLE); */
 
   /* Configure USB pull-up pin */
-  GPIO_InitStructure.GPIO_Pin = USB_DISCONNECT_PIN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
-  GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure);
+  /* GPIO_InitStructure.GPIO_Pin = USB_DISCONNECT_PIN; */
+  /* GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; */
+  /* GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; */
+  /* GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure); */
 
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE);
+  /* RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE); */
 
   /* Configure LEDS */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(GPIOF, &GPIO_InitStructure);
+  /* GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9; */
+  /* GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; */
+  /* GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; */
+  /* GPIO_Init(GPIOF, &GPIO_InitStructure); */
 }
 
 /*******************************************************************************
@@ -146,81 +152,7 @@ void USB_Interrupts_Config(void)
 
 }
 
-/*******************************************************************************
-* Function Name  : USB_Cable_Config
-* Description    : Software Connection/Disconnection of USB Cable
-* Input          : None.
-* Return         : Status
-*******************************************************************************/
-void USB_Cable_Config (FunctionalState NewState)
-{
-  if (NewState != DISABLE)
-  {
-    GPIO_ResetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
-  }
-  else
-  {
-    GPIO_SetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
-  }
-}
 
-/*******************************************************************************
-* Function Name  : Handle_USBAsynchXfer.
-* Description    : send data to USB.
-* Input          : None.
-* Return         : none.
-*******************************************************************************/
-void Handle_USBAsynchXfer (void)
-{
-  
-  uint16_t USB_Tx_ptr;
-  uint16_t USB_Tx_length;
-
-
-    if (USART_Rx_ptr_out == USART_RX_DATA_SIZE)
-    {
-      USART_Rx_ptr_out = 0;
-    }
-
-    if(USART_Rx_ptr_out == USART_Rx_ptr_in)
-    {
-      USB_Tx_State = 0;
-      return;
-    }
-
-    if(USART_Rx_ptr_out > USART_Rx_ptr_in) /* rollback */
-    {
-      USART_Rx_length = USART_RX_DATA_SIZE - USART_Rx_ptr_out;
-    }
-    else
-    {
-      USART_Rx_length = USART_Rx_ptr_in - USART_Rx_ptr_out;
-    }
-
-    if (USART_Rx_length > VIRTUAL_COM_PORT_DATA_SIZE)
-    {
-      USB_Tx_ptr = USART_Rx_ptr_out;
-      USB_Tx_length = VIRTUAL_COM_PORT_DATA_SIZE;
-
-      USART_Rx_ptr_out += VIRTUAL_COM_PORT_DATA_SIZE;
-      USART_Rx_length -= VIRTUAL_COM_PORT_DATA_SIZE;
-    }
-    else
-    {
-      USB_Tx_ptr = USART_Rx_ptr_out;
-      USB_Tx_length = USART_Rx_length;
-
-      USART_Rx_ptr_out += USART_Rx_length;
-      USART_Rx_length = 0;
-    }
-    USB_Tx_State = 1;
-
-
-        UserToPMABufferCopy(&USART_Rx_Buffer[USB_Tx_ptr], ENDP1_TXADDR, USB_Tx_length);
-        SetEPTxCount(ENDP1, USB_Tx_length);
-        SetEPTxValid(ENDP1);
-
-}
 /*******************************************************************************
 * Function Name  : UART_To_USB_Send_Data.
 * Description    : send the received data from UART 0 to USB.
@@ -295,45 +227,76 @@ static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len)
 void USB_SetLeds(uint8_t LED_Command) {
 	switch (LED_Command) {
 	case 'A': {
-	    GPIO_SetBits(GPIOF, GPIO_Pin_6);
+              STM_EVAL_LEDOn(LED4);
 	    break;
 	}
 	case 'B': {
-	    GPIO_SetBits(GPIOF, GPIO_Pin_7);
+              STM_EVAL_LEDOn(LED5);
 	    break;
 	}
 	case 'C': {
-	    GPIO_SetBits(GPIOF, GPIO_Pin_8);
+              STM_EVAL_LEDOn(LED6);
 	    break;
 	}
 	case 'D': {
-	    GPIO_SetBits(GPIOF, GPIO_Pin_9);
-	    break;
-	}
-	case 'a': {
-	    GPIO_ResetBits(GPIOF, GPIO_Pin_6);
-	    break;
-	}
-	case 'b': {
-	    GPIO_ResetBits(GPIOF, GPIO_Pin_7);
-	    break;
-	}
-	case 'c': {
-	    GPIO_ResetBits(GPIOF, GPIO_Pin_8);
-	    break;
-	}
-	case 'd': {
-	    GPIO_ResetBits(GPIOF, GPIO_Pin_9);
-	    break;
-	}
-	case '1': {
-	    GPIO_SetBits(GPIOF, GPIO_Pin_6 | GPIO_Pin_7 |GPIO_Pin_8 |GPIO_Pin_9);
-	    break;
-	}
-	case '0': {
-	    GPIO_ResetBits(GPIOF, GPIO_Pin_6 | GPIO_Pin_7 |GPIO_Pin_8 |GPIO_Pin_9);
+              STM_EVAL_LEDOn(LED7);
 	    break;
 	}
 	}
+}
+/*******************************************************************************
+* Function Name  : Handle_USBAsynchXfer.
+* Description    : send data to USB.
+* Input          : None.
+* Return         : none.
+*******************************************************************************/
+void Handle_USBAsynchXfer(void)
+{
+  uint16_t USB_Tx_ptr;
+  uint16_t USB_Tx_length;
+
+  if (USART_Rx_ptr_out == USART_RX_DATA_SIZE)
+  {
+    USART_Rx_ptr_out = 0;
+  }
+
+  if(USART_Rx_ptr_out == USART_Rx_ptr_in)
+  {
+    USB_Tx_State = 0;
+    return;
+  }
+
+  if(USART_Rx_ptr_out > USART_Rx_ptr_in) /* rollback */
+  {
+    USART_Rx_length = USART_RX_DATA_SIZE - USART_Rx_ptr_out;
+  }
+  else
+  {
+    USART_Rx_length = USART_Rx_ptr_in - USART_Rx_ptr_out;
+  }
+
+  if (USART_Rx_length > VIRTUAL_COM_PORT_DATA_SIZE)
+  {
+    USB_Tx_ptr = USART_Rx_ptr_out;
+    USB_Tx_length = VIRTUAL_COM_PORT_DATA_SIZE;
+
+    USART_Rx_ptr_out += VIRTUAL_COM_PORT_DATA_SIZE;
+    USART_Rx_length -= VIRTUAL_COM_PORT_DATA_SIZE;
+  }
+  else
+  {
+    USB_Tx_ptr = USART_Rx_ptr_out;
+    USB_Tx_length = USART_Rx_length;
+
+    USART_Rx_ptr_out += USART_Rx_length;
+    USART_Rx_length = 0;
+  }
+
+  USB_Tx_State = 1;
+
+  UserToPMABufferCopy(&USART_Rx_Buffer[USB_Tx_ptr], ENDP1_TXADDR, USB_Tx_length);
+  SetEPTxCount(ENDP1, USB_Tx_length);
+  SetEPTxValid(ENDP1);
+
 }
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

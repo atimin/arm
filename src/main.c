@@ -31,7 +31,8 @@
 #include "stm32f30x_conf.h"
 #include "common.h"
 #include "usb_lib.h"
-
+#include "usb_pwr.h"
+#include "usb_istr.h"
 
 
 
@@ -63,6 +64,7 @@ int main(void)
 	Set_USBClock();
 	USB_Interrupts_Config();
 	USB_Init();
+  PowerOn();
 
 	STM_EVAL_LEDInit(LED10);
 
