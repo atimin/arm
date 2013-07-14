@@ -89,7 +89,7 @@ void SOF_Callback(void)
       
       /* Check the data to be sent through IN pipe */
 
-      /* Handle_USBAsynchXfer(); */
+      Handle_USBAsynchXfer();
 
     }
   }  

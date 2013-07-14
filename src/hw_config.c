@@ -26,6 +26,8 @@
 #define RCC_APB2Periph_GPIO_DISCONNECT RCC_APB2Periph_GPIOF
 #define USB_DISCONNECT_PIN	GPIO_Pin_11
 #define USB_DISCONNECT  GPIOF
+
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 ErrorStatus HSEStartUpStatus;
@@ -51,11 +53,13 @@ static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len);
 void Set_System(void)
 {
 
+
+    GPIO_InitTypeDef  GPIO_InitStructure;
+
 	STM_EVAL_LEDInit(LED3);
 	STM_EVAL_LEDInit(LED4);
 	STM_EVAL_LEDInit(LED5);
 	STM_EVAL_LEDInit(LED6);
-  /* GPIO_InitTypeDef  GPIO_InitStructure; */
   
   /*!< At this stage the microcontroller clock setting is already configured, 
        this is done through SystemInit() function which is called from startup
@@ -65,15 +69,21 @@ void Set_System(void)
      */   
   
   
-  /* Enable USB_DISCONNECT GPIO clock */
-  /* RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT, ENABLE); */
+  /* Enable USB GPIO clock */
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 
   /* Configure USB pull-up pin */
-  /* GPIO_InitStructure.GPIO_Pin = USB_DISCONNECT_PIN; */
-  /* GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; */
-  /* GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; */
-  /* GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure); */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
+
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, GPIO_AF_14);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, GPIO_AF_14);
+
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
   /* RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE); */
 
   /* Configure LEDS */
@@ -109,6 +119,7 @@ void Enter_LowPowerMode(void)
   /* Set the device state to suspend */
   bDeviceState = SUSPENDED;
 }
+
 
 /*******************************************************************************
 * Function Name  : Leave_LowPowerMode
