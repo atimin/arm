@@ -54,13 +54,8 @@ void Set_System(void)
 {
 
 
-    GPIO_InitTypeDef  GPIO_InitStructure;
+  GPIO_InitTypeDef  GPIO_InitStructure;
 
-	STM_EVAL_LEDInit(LED3);
-	STM_EVAL_LEDInit(LED4);
-	STM_EVAL_LEDInit(LED5);
-	STM_EVAL_LEDInit(LED6);
-  
   /*!< At this stage the microcontroller clock setting is already configured, 
        this is done through SystemInit() function which is called from startup
        file (startup_stm32f10x_xx.s) before to branch to application main.
@@ -235,26 +230,7 @@ static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len)
   }
 }
 
-void USB_SetLeds(uint8_t LED_Command) {
-	switch (LED_Command) {
-	case 'A': {
-              STM_EVAL_LEDOn(LED4);
-	    break;
-	}
-	case 'B': {
-              STM_EVAL_LEDOn(LED5);
-	    break;
-	}
-	case 'C': {
-              STM_EVAL_LEDOn(LED6);
-	    break;
-	}
-	case 'D': {
-              STM_EVAL_LEDOn(LED7);
-	    break;
-	}
-	}
-}
+
 /*******************************************************************************
 * Function Name  : Handle_USBAsynchXfer.
 * Description    : send data to USB.

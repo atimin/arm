@@ -167,13 +167,17 @@ void Step(Servo_TypeDef serv)
 	/* Calc the next position */
 	if (s->currentAngle == s->setAngle)
 		return;
-	else if (s->currentAngle < s->setAngle)
+	else if (s->currentAngle < s->setAngle) {
 		nextPose = s->currentAngle + s->velocity / CONTROL_FREQ;
-	else if (s->currentAngle > s->setAngle)
+	  /* Turn by one step */
+	  s->currentAngle = (nextPose >= s->setAngle ?  s->setAngle : nextPose);
+  }
+	else if (s->currentAngle > s->setAngle) {
 		nextPose = s->currentAngle - s->velocity / CONTROL_FREQ;
+	  /* Turn by one step */
+	  s->currentAngle = (nextPose <= s->setAngle ?  s->setAngle : nextPose);
+  }
 
-	/* Turn by one step */
-	s->currentAngle = (nextPose >= s->setAngle ?  s->setAngle : nextPose);
 
 	/* Change channel */
 	timChannelInit.TIM_OCMode = TIM_OCMode_PWM1;

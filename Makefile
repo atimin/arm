@@ -35,7 +35,7 @@ INCLUDES 	= -ILibraries/STM32F30x_StdPeriph_Driver/inc/ \
 			-Iinc/
 			
 # Set Libraries
-LIBS		= -lm -lc
+LIBS		= -lm -lc -lnosys
 
 ###################################################
 # Set Board

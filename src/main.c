@@ -69,16 +69,13 @@ int main(void)
 
 	STM_EVAL_LEDInit(LED10);
 
-	/* Servo_Init(SERVO1); */
-	/* Servo_Init(SERVO2); */
-	/* Servo_Init(SERVO3); */
-	/* Servo_Init(SERVO4); */
-	/* Servo_Init(SERVO5); */
-	/* Servo_Init(SERVO6); */
+	Servo_Init(SERVO1);
+	Servo_Init(SERVO2);
+	Servo_Init(SERVO3);
+	Servo_Init(SERVO4);
+	Servo_Init(SERVO5);
+	Servo_Init(SERVO6);
 
-	/* Servo_SetAngle(SERVO1, M_PI_2, M_PI_4 / 10); */
-	/* Servo_SetAngle(SERVO2, M_PI_2, M_PI_4 / 10); */
-	/* Servo_SetAngle(SERVO3, M_PI_2, M_PI_4 / 10); */
 
 	while(1)
 	{

@@ -20,6 +20,8 @@
 #include "hw_config.h"
 #include "usb_istr.h"
 #include "usb_pwr.h"
+#include "pc_control.h"
+#include <stdio.h>
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -33,6 +35,7 @@ uint8_t USB_Rx_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
+void printi(const char *str, uint8_t i);
 /*******************************************************************************
 * Function Name  : EP1_IN_Callback
 * Description    :
@@ -54,15 +57,15 @@ void EP1_IN_Callback (void)
 *******************************************************************************/
 void EP3_OUT_Callback(void)
 {
-  uint16_t USB_Rx_Cnt;
-  uint16_t i;
+  uint8_t error;
   
   /* Get the received data buffer and update the counter */
-  USB_Rx_Cnt = USB_SIL_Read(EP3_OUT, USB_Rx_Buffer);
 
-  for (i=0; i<USB_Rx_Cnt; i++) {
-	  USB_SetLeds(USB_Rx_Buffer[i]);
-  }
+  USB_SIL_Read(EP3_OUT, USB_Rx_Buffer);
+
+  error = exec_command((const char*)USB_Rx_Buffer);
+
+  printi("[STATUS=%i]", error);
   
   /* Enable the receive of data on EP3 */
   SetEPRxValid(ENDP3);
@@ -96,3 +99,16 @@ void SOF_Callback(void)
 }
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
 
+void printi(const char *str, uint8_t num) 
+{
+  uint8_t len = strlen(str);
+  uint8_t i;
+    
+  for(i = 0; i < len; i++) {
+    if (str[i] == '%') {
+      i++;
+      if (str[i] == 'i') 
+        USB_Send_Data(num + 0x30);
+    } else USB_Send_Data(str[i]);
+  }
+}
