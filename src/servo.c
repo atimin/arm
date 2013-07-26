@@ -136,8 +136,8 @@ void Servo_SetAngle(Servo_TypeDef serv, float_t angle, float_t velocity)
 {
 	if (angle < 0)
 		angle = 0;
-	if (angle > M_PI_2)
-		angle = M_PI_2;
+	if (angle > M_PI)
+		angle = M_PI;
 
 	servs[serv].setAngle = angle;
 	servs[serv].velocity = velocity;
@@ -183,7 +183,7 @@ void Step(Servo_TypeDef serv)
 	timChannelInit.TIM_OCMode = TIM_OCMode_PWM1;
 	timChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	timChannelInit.TIM_OCPolarity =TIM_OCPolarity_High;
-	timChannelInit.TIM_Pulse = PWM_MIN + (s->currentAngle / M_PI_2)*(PWM_MAX - PWM_MIN);
+	timChannelInit.TIM_Pulse = PWM_MIN + (s->currentAngle / M_PI)*(PWM_MAX - PWM_MIN);
 
 	TIM_OCXInit[serv](TIM[serv], &timChannelInit);
 }

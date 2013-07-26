@@ -10,7 +10,7 @@ CMD_Status_t exec_command(const char* cmd)
   sscanf(cmd, "[SERV=%i ANGLE=%f VEL=%f]", &serv, &angle, &velocity);
 
   if (serv >= 0 && serv < 6)
-    if (angle >= 0 && angle <= M_PI/2)
+    if (angle >= 0 && angle <= M_PI)
       if (velocity > 0) 
         Servo_SetAngle(serv, angle, velocity);
   else status = VEL_ERROR;
