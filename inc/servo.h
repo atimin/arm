@@ -91,6 +91,7 @@ typedef struct
 extern void Servo_Init(Servo_TypeDef serv);
 extern void Servo_SetAngle(Servo_TypeDef serv, float_t angle, float_t velocity);
 extern float_t Servo_GetAngle(Servo_TypeDef serv);
+extern float_t Servo_GetVelocity(Servo_TypeDef serv);
 extern uint8_t Servo_IsMove(Servo_TypeDef serv);
 
 #define SERVO_H_

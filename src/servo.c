@@ -127,9 +127,9 @@ void Servo_Init(Servo_TypeDef serv)
 	/* Make struct for servo */
 
 	servs[serv].id = serv;
-	servs[serv].currentAngle = M_PI/4;
-	servs[serv].setAngle = M_PI/4;
-	servs[serv].velocity = 0;
+	servs[serv].currentAngle = M_PI_2;
+	servs[serv].setAngle = M_PI_2;
+	servs[serv].velocity = 0.0;
 }
 
 void Servo_SetAngle(Servo_TypeDef serv, float_t angle, float_t velocity)
@@ -146,6 +146,11 @@ void Servo_SetAngle(Servo_TypeDef serv, float_t angle, float_t velocity)
 float_t Servo_GetAngle(Servo_TypeDef serv)
 {
 	return servs[serv].currentAngle;
+}
+
+float_t Servo_GetVelocity(Servo_TypeDef serv)
+{
+	return servs[serv].velocity;
 }
 
 uint8_t Servo_IsMove(Servo_TypeDef serv)
@@ -165,8 +170,10 @@ void Step(Servo_TypeDef serv)
 	float_t nextPose;
 
 	/* Calc the next position */
-	if (s->currentAngle == s->setAngle)
+	if (s->currentAngle == s->setAngle) {
+    s->velocity = 0.0;
 		return;
+  }
 	else if (s->currentAngle < s->setAngle) {
 		nextPose = s->currentAngle + s->velocity / CONTROL_FREQ;
 	  /* Turn by one step */

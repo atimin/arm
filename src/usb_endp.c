@@ -28,6 +28,7 @@
 
 /* Interval between sending IN packets in frame number (1 frame = 1ms) */
 #define VCOMPORT_IN_FRAME_INTERVAL             5
+#define SIZE_OF_RESPOND                        50
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -57,15 +58,16 @@ void EP1_IN_Callback (void)
 *******************************************************************************/
 void EP3_OUT_Callback(void)
 {
-  uint8_t error;
+  char respond[SIZE_OF_RESPOND];
+  uint8_t size_respond = 0;
   
   /* Get the received data buffer and update the counter */
 
   USB_SIL_Read(EP3_OUT, USB_Rx_Buffer);
 
-  error = exec_command((const char*)USB_Rx_Buffer);
+  size_respond = exec_command((const char*)USB_Rx_Buffer, respond);
 
-  printi("[STATUS=%i]", error);
+  send_bufer(respond, size_respond);
   
   /* Enable the receive of data on EP3 */
   SetEPRxValid(ENDP3);
@@ -99,16 +101,10 @@ void SOF_Callback(void)
 }
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
 
-void printi(const char *str, uint8_t num) 
+void send_bufer(char *str, uint8_t size) 
 {
-  uint8_t len = strlen(str);
   uint8_t i;
-    
-  for(i = 0; i < len; i++) {
-    if (str[i] == '%') {
-      i++;
-      if (str[i] == 'i') 
-        USB_Send_Data(num + 0x30);
-    } else USB_Send_Data(str[i]);
-  }
+
+  for(i = 0; i < size; i++) 
+    USB_Send_Data(str[i]);
 }
